@@ -7,6 +7,12 @@ public class ImageOperations {
 		_app = app;
 	}
 	
+	
+	public void applyFilter(Filter f){
+		f.applyFilter(_app.getImage());
+		_app.repaint();
+	}
+	
 	public void convertColor(int choice){
 		int x,y;
 		BufferedImage img = _app.getImage();
@@ -78,4 +84,123 @@ public class ImageOperations {
 		_app.repaint();
 	}
 	
+	public void hHistogramEqualize(float alpha){
+		int x,y;
+		int[] histogram = _app.calculateHistogram(0);
+		float[] cdfHistogram = new float[histogram.length];
+		float rFactor = .299f;
+		float gFactor = .587f;
+		float bFactor = .114f;
+		float rDiff,bDiff;
+		
+		
+		
+		BufferedImage img = _app.getImage();
+		Pixel p = new Pixel();
+		
+		
+		if(img != null){
+			int width = img.getWidth();
+			int height = img.getHeight();
+			int numPixels = width*height;
+			int sum = 0;
+			float intensity;
+			float newRed;
+			float newGreen;
+			float newBlue;
+			
+			
+			for(int i=0;i<histogram.length;i++){
+				sum += histogram[i];
+				cdfHistogram[i] = (float)sum/(float)numPixels;
+			}
+			
+			for(x=0;x<width;x++){
+				for(y=0;y<height;y++){
+					p.setPixel(img.getRGB(x, y));
+					rDiff = (float)p.getRed()/(float)p.getGreen();
+					bDiff = (float)p.getBlue()/(float)p.getGreen();
+					intensity = cdfHistogram[(int)p.getIntensity()] * 255f;
+					intensity = alpha*intensity + (1-alpha)*p.getIntensity();
+					newGreen = intensity/((rDiff*rFactor) + gFactor + (bDiff * bFactor));
+					newRed = newGreen * rDiff;
+					newBlue = newGreen * bDiff;
+					p.setRed((int)newRed);
+					p.setGreen((int)newGreen);
+					p.setBlue((int)newBlue);
+					img.setRGB(x, y, p.getPixel());
+				}
+			}
+		}
+		
+		_app.calculateHistogram(0);
+		_app.repaint();
+		
+		
+	}
+	
+	public void nHistogramEqualize(){
+		int x,y;
+		int[] histogram = _app.calculateHistogram(0);
+		float[] cdfHistogram = new float[histogram.length];
+		float rFactor = .299f;
+		float gFactor = .587f;
+		float bFactor = .114f;
+		float rFrac,gFrac,bFrac,iFrac;
+		
+		BufferedImage img = _app.getImage();
+		Pixel p = new Pixel();
+		
+		
+		if(img != null){
+			int width = img.getWidth();
+			int height = img.getHeight();
+			int numPixels = width*height;
+			int sum = 0;
+			float intensity,oldIntensity;
+			float newRed;
+			float newGreen;
+			float newBlue;
+			float rgbTriplet;
+			
+			for(int i=0;i<histogram.length;i++){
+				sum += histogram[i];
+				cdfHistogram[i] = (float)sum/(float)numPixels;
+			}
+			
+			for(x=0;x<width;x++){
+				for(y=0;y<height;y++){
+					p.setPixel(img.getRGB(x, y));
+					
+					rgbTriplet = (float)p.getRed() + (float)p.getGreen() + (float)p.getBlue();
+					//get color ratios
+					rFrac = (float)p.getRed()/(rgbTriplet);
+					gFrac = (float)p.getGreen()/(rgbTriplet);
+					bFrac = (float)p.getBlue()/(rgbTriplet);
+					
+					//get old intensity/luma value
+					oldIntensity = p.getIntensity();
+					
+					//get new intensity/luma value
+					intensity = cdfHistogram[(int)p.getIntensity()] * 255f;
+					
+					iFrac = intensity/oldIntensity;
+					
+					newRed = iFrac * rFrac * rgbTriplet;
+					newGreen = iFrac * gFrac * rgbTriplet;
+					newBlue = iFrac * gFrac * rgbTriplet;
+					
+					p.setRed((int)newRed);
+					p.setGreen((int)newGreen);
+					p.setBlue((int)newBlue);
+					img.setRGB(x, y, p.getPixel());
+				}
+			}
+		}
+		
+		_app.calculateHistogram(0);
+		_app.repaint();
+		
+		
+	}
 }

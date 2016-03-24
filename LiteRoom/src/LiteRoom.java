@@ -33,7 +33,8 @@ public class LiteRoom {
 		//add operation panels to opPanel
 		opPanel.add(convertPanel);
 		opPanel.add(hgPanel);
-		opPanel.addEqualize();
+		opPanel.add(opPanel.getHgPanel());
+		opPanel.addFilter();
 		
 		//add frame elements
 		frame.getContentPane().setLayout(new BorderLayout());
@@ -41,7 +42,6 @@ public class LiteRoom {
 		frame.setJMenuBar(new topMenuBar(this));
 		frame.add(imgPanel,BorderLayout.CENTER);
 		frame.add(opPanel, BorderLayout.EAST);
-		
 		frame.pack();
 		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
@@ -84,7 +84,15 @@ public class LiteRoom {
 		return hgPanel.calculateHistogram(choice);
 	}
 	
-	public void histogramEqualize(){
-		imgOperations.histogramEqualize();
+	public void histogramEqualize(float alpha){
+		imgOperations.hHistogramEqualize(alpha);
+	}
+	
+	public void setHistogramScalar(int alpha){
+		
+	}
+	
+	public void applyFilter(){
+		imgOperations.applyFilter(new SobelFilter());
 	}
 }

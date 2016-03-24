@@ -44,7 +44,7 @@ public class ConvertPanel extends JPanel{
 	}
 	
 	
-	//can simplify into 1 handler with getSource
+	//can simplify into 1 handler with getSource?
 	private class ConvertRedButtonHandler implements ActionListener{
 		private LiteRoom _app;
 		public ConvertRedButtonHandler(LiteRoom app){
