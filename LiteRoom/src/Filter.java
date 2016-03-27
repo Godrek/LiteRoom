@@ -1,6 +1,6 @@
 import java.awt.image.BufferedImage;
 
 public class Filter{
-	public void applyFilter(BufferedImage img){}
+	public BufferedImage applyFilter(BufferedImage img){return img;}
 
 }

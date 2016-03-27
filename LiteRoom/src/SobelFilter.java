@@ -13,7 +13,7 @@ public class SobelFilter extends Filter {
 	public SobelFilter(){}
 	
 	@Override
-	public void applyFilter(BufferedImage img) {
+	public BufferedImage applyFilter(BufferedImage img) {
 		width = img.getWidth();
 		height = img.getHeight();
 		p = new Pixel();
@@ -67,7 +67,7 @@ public class SobelFilter extends Filter {
 				}
 			} 
 		}
-
+		return img;
 	}
 
 }

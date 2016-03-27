@@ -39,7 +39,7 @@ public class LiteRoom {
 		//add frame elements
 		frame.getContentPane().setLayout(new BorderLayout());
 		
-		frame.setJMenuBar(new topMenuBar(this));
+		frame.setJMenuBar(new TopMenuBar(this));
 		frame.add(imgPanel,BorderLayout.CENTER);
 		frame.add(opPanel, BorderLayout.EAST);
 		frame.pack();
@@ -76,6 +76,14 @@ public class LiteRoom {
 		return imgPanel.getImage();
 	}
 	
+	public BufferedImage getDCImage(){
+		return imgPanel.getDCImage();
+	}
+	
+	public void updateImage(BufferedImage img){
+		imgPanel.updateImage(img);
+	}
+	
 	public void repaint(){
 		frame.repaint();
 	}
@@ -88,11 +96,11 @@ public class LiteRoom {
 		imgOperations.hHistogramEqualize(alpha);
 	}
 	
-	public void setHistogramScalar(int alpha){
-		
+	public void undoOperation(){
+		imgPanel.undoOperation();
 	}
 	
-	public void applyFilter(){
-		imgOperations.applyFilter(new SobelFilter());
+	public void applyFilter(Filter f){
+		imgOperations.applyFilter(f);
 	}
 }
