@@ -6,11 +6,12 @@ public class SobelFilter extends Filter {
 	private int width,height;
 	private float[][] xPass,yPass;
 	private int x,y;
+	private SobelFilterOptions _options;
 	private float accumulator;
 	private Pixel p;
 
 	
-	public SobelFilter(){}
+	public SobelFilter(SobelFilterOptions options){_options = options;}
 	
 	@Override
 	public BufferedImage applyFilter(BufferedImage img) {
@@ -60,10 +61,19 @@ public class SobelFilter extends Filter {
 					xsq = (float) Math.pow(xPass[x][y], 2);
 					ysq = (float) Math.pow(yPass[x][y], 2);
 					p.setGrayscale((int)Math.sqrt(xsq+ysq));
-					if(Math.min(Math.pow(p.getRed(),3),255) >= 50)
-						img.setRGB(x, y, p.getPixel());
-					else
-						img.setRGB(x, y, 0);
+					//Math.min(Math.pow(p.getRed(),3),255) >= 50
+					if(p.getRed() > 30){
+						if(_options.isBlack())
+							img.setRGB(x, y, 0);
+						else
+							img.setRGB(x, y, p.setGrayscale(255));
+					}
+					else{
+						if(_options.isBlack())
+							img.setRGB(x, y, p.setGrayscale(255));
+						else
+							img.setRGB(x, y, 0);	
+					}
 				}
 			} 
 		}

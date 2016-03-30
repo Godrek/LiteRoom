@@ -1,64 +1,52 @@
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 @SuppressWarnings("serial")
-public class HistogramPanel extends JPanel{
-	private int[] histogram;
-	private LiteRoom _app;
-	private int maxValue;
+public class HistogramPanel extends JPanel {
+	private Histogram _histogram;
 	
-	public HistogramPanel(LiteRoom app){
-		_app = app;
+	private JButton equalize;
+	private JSlider histogramScalar;
+	private JPanel histogramEq;
+
+	public HistogramPanel(LiteRoom app, Histogram histogram){
+		_histogram = histogram;
+		this.setLayout(new GridLayout(2,1));
+		
+		histogramEq = new JPanel();
+		histogramEq.setLayout(new GridLayout(2,1));
+		
+		histogramScalar = new JSlider();
+		histogramScalar.setMaximum(100);
+		histogramScalar.setMinimum(0);
+		
+		equalize = new JButton("EQUALIZE");
+		equalize.addActionListener(new EqualizeHistogramButtonHandler(app,histogramScalar));
+		
+		histogramEq.add(equalize);
+		histogramEq.add(histogramScalar);
+		this.add(_histogram);
+		this.add(histogramEq);
 	}
 	
 	public int[] calculateHistogram(int choice){
-		BufferedImage img = _app.getImage();
-		int x,y;
-		Pixel p = new Pixel();
-		histogram = new int[256];
-		maxValue = 0;
-		
-		for(x=0;x<img.getWidth();x++){
-			for(y=0;y<img.getHeight();y++){
-				p.setPixel(img.getRGB(x, y));
-				switch(choice){
-					case 0: histogram[(int)p.getIntensity()]++;
-							break;
-					case 1: histogram[(int)p.getRed()]++;
-							break;
-					case 2: histogram[(int)p.getGreen()]++;
-							break;
-					case 3: histogram[(int)p.getBlue()]++;
-							break;
-				}
-			}
-		}
-		
-		for(int i=0;i<histogram.length;i++){
-			maxValue = Math.max(maxValue, histogram[i]);
-		}
-		
-		return histogram;
+		return _histogram.calculateHistogram(choice);
 	}
 	
-	@Override
-	public Dimension getPreferredSize(){
-		return new Dimension(256,400);
-	}
-	
-	@Override
-	public void paintComponent(Graphics g){
-		int height = getHeight();
-		
-		if(histogram != null){
-			for(int i=0;i<histogram.length;i++){
-				g.drawLine(i, height - ((int)((((float)histogram[i])/((float)maxValue))*((float)height))), i, height);
-				System.out.println("i: " + i + " histogram[i]: " + histogram[i] + " max value: " + maxValue + " height: " + height);
-				System.out.println(((int)((((float)histogram[i])/((float)maxValue))*((float)height))));
-				System.out.println();
-			}
+	private class EqualizeHistogramButtonHandler implements ActionListener{
+		private LiteRoom _app;
+		private JSlider _slider;
+		public EqualizeHistogramButtonHandler(LiteRoom app,JSlider slider){
+			_app = app;		
+			_slider = slider;
+		}
+		public void actionPerformed(ActionEvent e){
+			_app.histogramEqualize((float)_slider.getValue()/100f);
 		}
 	}
 }
