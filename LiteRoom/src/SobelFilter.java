@@ -7,9 +7,9 @@ public class SobelFilter extends Filter {
 	private float[][] xPass,yPass;
 	private int x,y;
 	private SobelFilterOptions _options;
-	private float accumulator;
 	private Pixel p;
-
+	private int tail,head;
+	private float[][] window = new float[3][3];
 	
 	public SobelFilter(SobelFilterOptions options){_options = options;}
 	
@@ -20,40 +20,62 @@ public class SobelFilter extends Filter {
 		p = new Pixel();
 		xPass = new float[width][height];
 		yPass = new float[width][height];
+		
 		if(img != null){
-			//xpass
+			
+			//kernel passes
 			for(x=0;x<width;x++){
 				for(y=0;y<height;y++){
-					accumulator = 0;
-					for(int i = -1;i<2;i++){
-						for(int j=-1;j<2;j++){	
-							if(x + i >= 0 && y + j >=0 && x + i < width && y + j < height)
-								p.setPixel(img.getRGB(x + i, y + j));
-							else
-								p.setPixel(0);
-							accumulator += p.getIntensity() * Sx[i+1][j+1];
+					
+					//prime moving window
+					if(y==0){
+						for(int i=0;i<3;i++){
+							window[i][0] = 0; //pad top of window w/ zeros
+							for(int j=1;j<3;j++){
+								try{
+									window[i][j] = p.setPixel(img.getRGB(x + i - 1, y + j - 1)).getIntensity();
+								}
+								catch(ArrayIndexOutOfBoundsException e){
+									window[i][j] = 0; //more zero padding if edge
+								}
+							}
 						}
+						for(int i=0;i<3;i++){
+							xPass[x][y] += window[0][i] * Sx[0][i];
+							xPass[x][y] += window[2][i] * Sx[2][i];
+							
+							yPass[x][y] += window[i][0] * Sy[i][0];
+							yPass[x][y] += window[i][2] * Sy[i][2];
+						}
+						tail = 0;
+						head = 1;
 					}
-					xPass[x][y] = accumulator/9f;
+					else{
+						//read in new row
+						for(int i=0;i<3;i++){
+							try{
+								window[i][tail] = p.setPixel(img.getRGB(x + i - 1, y + 1)).getIntensity();
+							}
+							catch(ArrayIndexOutOfBoundsException e){
+								window[i][tail] = 0;
+							}
+						}
+						for(int i=0;i<3;i++){
+							xPass[x][y] += window[0][(head+i)%3] * Sx[0][i];
+							xPass[x][y] += window[2][(head+i)%3] * Sx[2][i];
+							
+							yPass[x][y] += window[i][head] * Sy[i][0];
+							yPass[x][y] += window[i][tail] * Sy[i][2];
+						}
+						tail++;head++;tail%=3;head%=3;
+					}
+					//
+					xPass[x][y] /= 8f;
+					yPass[x][y] /= 8f;
+					
 				}
 			}
 
-			//ypass
-			for(x=0;x<width;x++){
-				for(y=0;y<height;y++){
-					accumulator = 0;
-					for(int i = -1;i<2;i++){
-						for(int j=-1;j<2;j++){	
-							if(x + i >= 0 && y + j >=0 && x + i < width && y + j < height)
-								p.setPixel(img.getRGB(x + i, y + j));
-							else
-								p.setPixel(0);
-							accumulator += p.getIntensity() * Sy[i+1][j+1];
-						}
-					}
-					yPass[x][y] = accumulator/9f;
-				}
-			}
 			//combination
 			float xsq,ysq;
 			for(x=0;x<width;x++){
@@ -62,7 +84,7 @@ public class SobelFilter extends Filter {
 					ysq = (float) Math.pow(yPass[x][y], 2);
 					p.setGrayscale((int)Math.sqrt(xsq+ysq));
 					//Math.min(Math.pow(p.getRed(),3),255) >= 50
-					if(p.getRed() > 30){
+					if(p.getRed() > _options.getThreshold()){
 						if(_options.isBlack())
 							img.setRGB(x, y, 0);
 						else
@@ -75,7 +97,7 @@ public class SobelFilter extends Filter {
 							img.setRGB(x, y, 0);	
 					}
 				}
-			} 
+			}  
 		}
 		return img;
 	}

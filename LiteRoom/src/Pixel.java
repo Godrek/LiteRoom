@@ -58,16 +58,19 @@ public class Pixel {
 		}
 		_p &= 0xFFFFFF00; _p += b;
 	}
-	public void setPixel(int p){
+	public Pixel setPixel(int p){
 		_p = p;
+		return this;
 	}
 	public int setGrayscale(int i){
+		if(i>256)
+			i=255;
+		if(i<0)
+			i=0;
 		i += (i<<16);
 		i += (i<<8);
 		_p &= 0xFF000000; _p += i;
-		//setRed(i);
-		//setGreen(i);
-		//setBlue(i);
+
 		return _p;
 	}
 	

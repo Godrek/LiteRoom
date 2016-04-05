@@ -1,6 +1,8 @@
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -14,7 +16,7 @@ public class FilterPanel extends JPanel {
 	private JComboBox<String> filterSelect;
 	private JPanel filterSubPanel;
 	private FilterOptionsPanel options;
-	private String[] filters = { "Sobel" };
+	private String[] filters = { "Sobel" , "Grayscale Gaussian"};
 	
 	public FilterPanel(LiteRoom app){
 		this.setLayout(new GridLayout(2,1));
@@ -27,8 +29,8 @@ public class FilterPanel extends JPanel {
 		filter.addActionListener(new ApplyFilterButtonHandler(_app));
 		
 		filterSelect = new JComboBox<String>(filters);
-		filterSelect.addActionListener(new FilterSelectActionHandler());
-		filterSelect.setSelectedIndex(0);
+		filterSelect.addItemListener(new FilterSelectChangeListener());
+		filterSelect.setSelectedIndex(1);
 		setFilterOptions(getSelection());
 		
 		filterSubPanel.add(filter);
@@ -38,9 +40,14 @@ public class FilterPanel extends JPanel {
 	}
 	
 	public void setFilterOptions(String choice){
+		if(options != null)
+			this.remove(options);
 		switch(choice){
-			case "Sobel": options = new SobelFilterOptions(_app);
+			case "Grayscale Gaussian": options = new GaussianFilterOptions();break;
+			case "Sobel": options = new SobelFilterOptions();break;
 		}
+		this.add(options);
+		this.revalidate();
 		_app.repaint();
 	}
 	
@@ -58,19 +65,22 @@ public class FilterPanel extends JPanel {
 			Filter f = new Filter();
 			String choice = getSelection();
 			switch(choice){
-				case "Sobel": f = new SobelFilter((SobelFilterOptions)options); 
+				case "Sobel": f = new SobelFilter((SobelFilterOptions)options);break;
+				case "Grayscale Gaussian": f = new GaussianFilter((GaussianFilterOptions)options);break;
 			}
 			_app.applyFilter(f);
 		}
 	}
 	
-	private class FilterSelectActionHandler implements ActionListener{
+
+	private class FilterSelectChangeListener implements ItemListener{
 		
-		public FilterSelectActionHandler(){
-		}
-		public void actionPerformed(ActionEvent e){
-			setFilterOptions(getSelection());
-		}
+	    public void itemStateChanged(ItemEvent event) {
+	       if (event.getStateChange() == ItemEvent.SELECTED) {
+	          Object item = event.getItem();
+	          setFilterOptions((String)item);
+	       }
+	    }       
 	}
 	
 }
