@@ -16,6 +16,7 @@ public class ConvertPanel extends JPanel{
 	
 	public ConvertPanel(LiteRoom app){
 		this.setLayout(new GridLayout(2,1));
+		this.setFocusable(false);
 		
 		convertSubPanel = new JPanel();
 		convertSubPanel.setLayout(new GridLayout(1,3));

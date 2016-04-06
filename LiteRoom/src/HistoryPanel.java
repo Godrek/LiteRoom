@@ -12,6 +12,7 @@ public class HistoryPanel extends JPanel{
 	
 	public HistoryPanel(LiteRoom app){
 		this.setLayout(new GridLayout(2,1));
+		this.setFocusable(false);
 		
 		reload = new JButton("RELOAD");
 		reload.addActionListener(new ReloadImageButtonHandler(app));

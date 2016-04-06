@@ -16,11 +16,12 @@ public class FilterPanel extends JPanel {
 	private JComboBox<String> filterSelect;
 	private JPanel filterSubPanel;
 	private FilterOptionsPanel options;
-	private String[] filters = { "Sobel" , "Grayscale Gaussian"};
+	private String[] filters = { "Sobel" , "Grayscale Gaussian", "Color Gaussian"};
 	
 	public FilterPanel(LiteRoom app){
 		this.setLayout(new GridLayout(2,1));
 		_app = app;
+		this.setFocusable(false);
 		
 		filterSubPanel = new JPanel();
 		filterSubPanel.setLayout(new GridLayout(2,1));
@@ -30,7 +31,7 @@ public class FilterPanel extends JPanel {
 		
 		filterSelect = new JComboBox<String>(filters);
 		filterSelect.addItemListener(new FilterSelectChangeListener());
-		filterSelect.setSelectedIndex(1);
+		filterSelect.setSelectedIndex(0);
 		setFilterOptions(getSelection());
 		
 		filterSubPanel.add(filter);
@@ -45,6 +46,7 @@ public class FilterPanel extends JPanel {
 		switch(choice){
 			case "Grayscale Gaussian": options = new GaussianFilterOptions();break;
 			case "Sobel": options = new SobelFilterOptions();break;
+			case "Color Gaussian": options = new GaussianFilterOptions();break;
 		}
 		this.add(options);
 		this.revalidate();
@@ -67,6 +69,7 @@ public class FilterPanel extends JPanel {
 			switch(choice){
 				case "Sobel": f = new SobelFilter((SobelFilterOptions)options);break;
 				case "Grayscale Gaussian": f = new GaussianFilter((GaussianFilterOptions)options);break;
+				case "Color Gaussian": f = new ColorGaussianFilter((GaussianFilterOptions)options);break;
 			}
 			_app.applyFilter(f);
 		}

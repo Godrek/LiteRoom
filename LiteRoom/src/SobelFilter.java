@@ -88,11 +88,11 @@ public class SobelFilter extends Filter {
 						if(_options.isBlack())
 							img.setRGB(x, y, 0);
 						else
-							img.setRGB(x, y, p.setGrayscale(255));
+							img.setRGB(x, y, p.getPixel() * 10);
 					}
 					else{
 						if(_options.isBlack())
-							img.setRGB(x, y, p.setGrayscale(255));
+							img.setRGB(x, y, p.getPixel()* 10);
 						else
 							img.setRGB(x, y, 0);	
 					}

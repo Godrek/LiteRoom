@@ -17,6 +17,7 @@ public class HistogramPanel extends JPanel {
 	public HistogramPanel(LiteRoom app, Histogram histogram){
 		_histogram = histogram;
 		this.setLayout(new GridLayout(2,1));
+		this.setFocusable(false);
 		
 		histogramEq = new JPanel();
 		histogramEq.setLayout(new GridLayout(2,1));

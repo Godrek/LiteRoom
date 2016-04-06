@@ -25,38 +25,41 @@ public class Pixel {
 		return _p;
 	}
 	
-	//Add checks to these to avoid spills when input values are > 255
-	public void setAlpha(int a){
+	public int setAlpha(int a){
 		if(a>255){
 			a=255;
 		} else if (a<0){
 			a=0;
 		}
 		_p &= 0x00FFFFFF; _p += (a<<24);
+		return _p;
 	}
-	public void setRed(int r){
+	public int setRed(int r){
 		if(r>255){
 			r=255;
 		} else if (r<0){
 			r=0;
 		}
 		_p &= 0xFF00FFFF; _p += (r<<16);
+		return _p;
 	}
-	public void setGreen(int g){
+	public int setGreen(int g){
 		if(g>255){
 			g=255;
 		} else if (g<0){
 			g=0;
 		}
 		_p &= 0xFFFF00FF; _p += (g<<8);
+		return _p;
 	}
-	public void setBlue(int b){
+	public int setBlue(int b){
 		if(b>255){
 			b=255;
 		} else if (b<0){
 			b=0;
 		}
 		_p &= 0xFFFFFF00; _p += b;
+		return _p;
 	}
 	public Pixel setPixel(int p){
 		_p = p;

@@ -6,7 +6,8 @@ public class GaussianFilterOptions extends FilterOptionsPanel {
 	private JSpinner kernelSizeSpinner;
 	
 	public GaussianFilterOptions(){
-		kernelSizeSpinner = new JSpinner(new SpinnerNumberModel(3,3,13,2));
+		super();
+		kernelSizeSpinner = new JSpinner(new SpinnerNumberModel(3,3,99,2));
 		this.add(kernelSizeSpinner);
 	}
 	

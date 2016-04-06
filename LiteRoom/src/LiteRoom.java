@@ -3,6 +3,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
@@ -16,6 +18,7 @@ public class LiteRoom {
 	private FilterPanel filterPanel;
 	private JPanel opPanel;
 	private HistogramPanel hgPanel;
+	private KeysListener keyListener;
 	
 	JFrame frame;
 	
@@ -23,6 +26,8 @@ public class LiteRoom {
 	{
 		frame = new JFrame("LiteRoom");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		keyListener = new KeysListener();
+		frame.addKeyListener(keyListener);
 		
 		//get screen dimensions and scale for half width and 2/3 height
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -60,6 +65,8 @@ public class LiteRoom {
 		//frame.pack();
 		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
+        frame.setFocusable(true);
+        frame.requestFocusInWindow();
 	}
 	
 	public static void main(String[] args)
@@ -101,6 +108,7 @@ public class LiteRoom {
 	
 	public void repaint(){
 		frame.repaint();
+		frame.requestFocus();
 	}
 	
 	public int[] calculateHistogram(int choice){
@@ -121,5 +129,21 @@ public class LiteRoom {
 	
 	public void applyFilter(Filter f){
 		imgOperations.applyFilter(f);
+	}
+	
+	private class KeysListener implements KeyListener{
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if (!e.isShiftDown() && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Z) {
+				imgPanel.undoOperation();
+			}
+			else if(e.isShiftDown() && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Z){
+				imgPanel.redoOperation();
+			}
+		}
+		@Override
+		public void keyReleased(KeyEvent arg0) {}
+		@Override
+		public void keyTyped(KeyEvent arg0) {}
 	}
 }

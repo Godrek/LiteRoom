@@ -9,9 +9,10 @@ public class SobelFilterOptions extends FilterOptionsPanel {
 	
 	
 	public SobelFilterOptions(){
+		super();
 		color = new JCheckBox("Black");
 		this.add(color);
-		thresholdSpinner = new JSpinner(new SpinnerNumberModel(127,0,255,1));
+		thresholdSpinner = new JSpinner(new SpinnerNumberModel(0,0,255,1));
 		this.add(thresholdSpinner);
 	}
 	
