@@ -1,15 +1,37 @@
 import java.awt.image.BufferedImage;
 
 public class SobelFilter extends Filter {
-	private float[][] Sx = {{-1,-2,-1},{0,0,0},{1,2,1}};
-	private float[][] Sy = {{-1,0,1},{-2,0,2},{-1,0,1}};
+	private double[][] Sx = {{-1,-2,-1},{0,0,0},{1,2,1}};
+	private double[][] Sy = {{-1,0,1},{-2,0,2},{-1,0,1}};
+	
+	private static final double pi = Math.PI;
+	
+	private static final char HORIZONTAL = 0;
+	private static final char NEGATIVEDIAGONAL = 1;
+	private static final char VERTICAL = 2;
+	private static final char POSITIVEDIAGONAL = 3;
+	
+	private static final double TWENTYTWOPOINTFIVE = pi/8d;
+	private static final double SIXTYSEVENPOINTFIVE = 3d*TWENTYTWOPOINTFIVE;
+	private static final double ONEHUNDREDTWELVEPOINTFIVE = 5d*TWENTYTWOPOINTFIVE;
+	private static final double ONEFIFTYSEVENPOINTFIVE = pi - TWENTYTWOPOINTFIVE;
+
+	
+	//Therefore, any edge direction falling within the yellow range (0 to 22.5 & 157.5 to 180 degrees) 
+	//is set to 0 degrees. Any edge direction falling in the green range (22.5 to 67.5 degrees) is set to 45 degrees. 
+	//Any edge direction falling in the blue range (67.5 to 112.5 degrees) is set to 90 degrees. 
+	//And finally, any edge direction falling within the red range (112.5 to 157.5 degrees) is set to 135 degrees. 
+	
+	
 	private int width,height;
-	private float[][] xPass,yPass;
+	private double[][] xPass,yPass;
 	private int x,y;
 	private SobelFilterOptions _options;
 	private Pixel p;
 	private int tail,head;
-	private float[][] window = new float[3][3];
+	private double[][] window = new double[3][3];
+	private double[][] magnitude;
+	private char[][] orientation;
 	
 	public SobelFilter(SobelFilterOptions options){_options = options;}
 	
@@ -17,9 +39,12 @@ public class SobelFilter extends Filter {
 	public BufferedImage applyFilter(BufferedImage img) {
 		width = img.getWidth();
 		height = img.getHeight();
+		double theta = 0;
 		p = new Pixel();
-		xPass = new float[width][height];
-		yPass = new float[width][height];
+		xPass = new double[width][height];
+		yPass = new double[width][height];
+		magnitude = new double[width][height];
+		orientation = new char[width][height];
 		
 		if(img != null){
 			
@@ -70,29 +95,48 @@ public class SobelFilter extends Filter {
 						tail++;head++;tail%=3;head%=3;
 					}
 					//
-					xPass[x][y] /= 8f;
-					yPass[x][y] /= 8f;
+					//xPass[x][y] /= 8f;
+					//yPass[x][y] /= 8f;
 					
+					//calculate magnitude
+					magnitude[x][y] = Math.sqrt(Math.pow(xPass[x][y], 2) + Math.pow(yPass[x][y], 2));
+					//calculate angle orientation
+					theta = Math.atan2(yPass[x][y], xPass[x][y]);
+					if(theta < 0)
+						theta += pi; //we only care about upper quadrants
+					
+					if(theta < TWENTYTWOPOINTFIVE || theta > ONEFIFTYSEVENPOINTFIVE){
+						orientation[x][y] = HORIZONTAL; //mark as horizontal
+					}
+					else if(theta >= TWENTYTWOPOINTFIVE && theta < SIXTYSEVENPOINTFIVE){
+						orientation[x][y] = NEGATIVEDIAGONAL;
+					}
+					else if(theta >= SIXTYSEVENPOINTFIVE && theta <= ONEHUNDREDTWELVEPOINTFIVE){
+						orientation[x][y] = VERTICAL;
+					}
+					else if(theta > ONEHUNDREDTWELVEPOINTFIVE && theta <= ONEFIFTYSEVENPOINTFIVE){
+						orientation[x][y] = POSITIVEDIAGONAL;
+					}
 				}
 			}
 
 			//combination
-			float xsq,ysq;
+			//float xsq,ysq;
 			for(x=0;x<width;x++){
 				for(y=0;y<height;y++){
-					xsq = (float) Math.pow(xPass[x][y], 2);
-					ysq = (float) Math.pow(yPass[x][y], 2);
-					p.setGrayscale((int)Math.sqrt(xsq+ysq));
+				//	xsq = (float) Math.pow(xPass[x][y], 2);
+					//ysq = (float) Math.pow(yPass[x][y], 2);
+					p.setGrayscale((int)magnitude[x][y]);
 					//Math.min(Math.pow(p.getRed(),3),255) >= 50
-					if(p.getRed() > _options.getThreshold()){
+					if(p.getRed() >= _options.getThreshold()){
 						if(_options.isBlack())
 							img.setRGB(x, y, 0);
 						else
-							img.setRGB(x, y, p.getPixel() * 10);
+							img.setRGB(x, y,p.getPixel() * _options.getMultiplier());
 					}
 					else{
 						if(_options.isBlack())
-							img.setRGB(x, y, p.getPixel()* 10);
+							img.setRGB(x, y, p.getPixel() * _options.getMultiplier());
 						else
 							img.setRGB(x, y, 0);	
 					}
