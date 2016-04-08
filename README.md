@@ -7,13 +7,16 @@ Can load/save most image types, supports drag/drop for loading images
 
 Can convert to individual R/G/B channels
 
-Histogram equalization: 
+
+**Histogram equalization:**
 
 slider that controls the degree of equalization.
 
 Higher values = closer to flat/more equal histogram
 
-Sobel filter:
+
+
+**Sobel filter:**
 
 Checkbox for black or white outline
 
@@ -21,11 +24,13 @@ left # parameter is for thresholding
 
 right # parameter is a scalar for magnitude values
 
-Grayscale/Color Gaussian Blur:
+
+
+**Grayscale/Color Gaussian Blur:**
 parameter controls kernel dimensions, 
 standard deviation is determined to best fit given dimensions
 
-Canny:
+**Canny:**
 left # parameter controls lower threshold
 
 right # parameter controls upper threshold
