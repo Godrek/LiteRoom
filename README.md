@@ -7,12 +7,18 @@ Can load/save most image types, supports drag/drop for loading images
 
 Can convert to individual R/G/B channels
 
-Histogram equalization with slider that controls the degree of equalization.
+Histogram equalization: 
+
+slider that controls the degree of equalization.
+
 Higher values = closer to flat/more equal histogram
 
 Sobel filter:
+
 Checkbox for black or white outline
+
 left # parameter is for thresholding
+
 right # parameter is a scalar for magnitude values
 
 Grayscale/Color Gaussian Blur:
@@ -21,10 +27,15 @@ standard deviation is determined to best fit given dimensions
 
 Canny:
 left # parameter controls lower threshold
-right # paramter controls upper threshold
+
+right # parameter controls upper threshold
+
 runs sobel filter, calculates magnitudes and orientation ->
+
 runs nonmaximum suppression to thin lines ->
+
 classifies edges as non-edge, weak, strong ->
+
 paints non-edge pixels black, weak pixels gray, strong pixels white
 
 
