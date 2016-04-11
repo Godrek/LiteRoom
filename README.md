@@ -1,6 +1,8 @@
 # LiteRoom
 Basic image processing application
 
+
+#Currently in process of refactoring and moving code to C++
 Features
 ------------------
 Can load/save most image types, supports drag/drop for loading images
